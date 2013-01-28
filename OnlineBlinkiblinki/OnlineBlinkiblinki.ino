@@ -21,12 +21,15 @@
 byte mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 //IPAddress server ("ratpack.makersand.co"); // Google
 char serverName[]="ratpack.makersand.co";
+int ledPin=9;
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
 // that you want to connect to (port 80 is default for HTTP):
 EthernetClient client;
 
 void setup() {
+//------------------------ led setup ------------------------
+pinMode(ledPin, OUTPUT);
  // Open serial communications and wait for port to open:
   Serial.begin(9600);
    while (!Serial) {
@@ -63,8 +66,20 @@ void loop()
   // if there are incoming bytes available 
   // from the server, read them and print them:
   if (client.available()) {
-    char c = client.read();
-    Serial.print(c);
+    // char c = client.read();
+    // Serial.print(c);
+     if(client.find("\"activated\": ")){
+      char state[1];
+      client.readBytes(state, 1);
+      if(atoi(state) == 1){
+        Serial.println("BUTTON PRESSED!");
+        digitalWrite(ledPin, HIGH);
+      }
+      else if(atoi(state) == 0) {
+        Serial.println("button not pressed.");
+        digitalWrite(ledPin, LOW);
+      }
+    } 
   }
 
   // if the server's disconnected, stop the client:
